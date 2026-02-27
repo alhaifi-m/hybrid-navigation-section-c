@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View, Switch } from "react-native";
+import { StyleSheet, Text, View, Switch, Pressable } from "react-native";
 import React, { useState } from "react";
+import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AppCard from "@/components/app-card";
 import { theme } from "@/styles/theme";
@@ -15,17 +16,19 @@ const Settings = () => {
         subtitle="Enable app notifications"
         right={<Switch value={notification} onValueChange={setNotification} />}
       />
-      <AppCard 
-      title="Account"
-      subtitle="Update profile settings"
-      right={
-        <Ionicons 
-        name="person-circle-outline"
-        size={24}
-        color={theme.color.primary}
+      <Pressable onPress={()=> router.push("/(tabs)/settings/profile")}>
+        <AppCard
+          title="Account"
+          subtitle="Update profile settings"
+          right={
+            <Ionicons
+              name="chevron-forward"
+              size={24}
+              color={theme.color.primary}
+            />
+          }
         />
-      }
-      />
+      </Pressable>
     </View>
   );
 };
