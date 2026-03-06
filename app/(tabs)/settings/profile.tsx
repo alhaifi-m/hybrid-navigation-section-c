@@ -24,7 +24,7 @@ const profileSchema = z.object({
     .string()
     .trim()
     .min(3, "Last name must be at least 3 characters long"),
-  email: z.string().trim().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   studentId: z
     .string()
     .trim()
