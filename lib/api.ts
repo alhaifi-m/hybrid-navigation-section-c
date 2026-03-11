@@ -124,7 +124,7 @@ export const getCourses = async (): Promise<Course[]> => {
     return COURSES;
 }
 
-const getCourseById = async (id: string): Promise<CourseDetail> => {
+export const getCourseById = async (id: string): Promise<CourseDetail> => {
     await delay();
     maybeThrow();
     const course = COURSE_DETAILS[id];
