@@ -1,5 +1,6 @@
 import {
   Alert,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,6 +9,8 @@ import {
   ActivityIndicator,
   View,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,6 +48,7 @@ const profile = () => {
   const [isLoading, setIsLoading] = useState(true); // tracks loading state while we load saved data
   const [isEditing, setIsEditing] = useState(false); // tracks if we are in edit mode or not
   const [hasSavedData, setHasSavedData] = useState(false); // track if we have any saved data in the local storage
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
 
   const {
     control,
@@ -82,10 +86,72 @@ const profile = () => {
       } else {
         setIsEditing(true); // first visit -- stare in edit mode
       }
+
+      const savedPhoto = await storage.get<string>(
+        storage.STORAGE_KEY.PROFILE_PHOTO,
+      );
+      if (savedPhoto !== null) {
+        setPhotoUri(savedPhoto);
+      }
       setIsLoading(false);
     };
     loadingProfile();
   }, []);
+
+  const handlePhotoPress = () => {
+    Alert.alert("Profile Photo", "Choose a source", [
+      { text: "Take Photo", onPress: () => openPicker("camera") },
+      { text: "Choose from Library", onPress: () => openPicker("library") },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
+  const openPicker = async (source: "camera" | "library") => {
+    // step 1: Request the appropriate permissions
+    if (source === "camera") {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Camera Access is required to take a profile photo.  Enable in settings",
+        );
+        return;
+      }
+    } else {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Premission Denied",
+          "Photo library access is required to choose a profile photo. Enable it in settings",
+        );
+        return;
+      }
+    }
+
+    // Setp 2: Launch the Picker
+    const result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: "images",
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: "images",
+            aspect: [1, 1],
+            quality: 0.8,
+          });
+
+    // Step 3: Save the URI if user did not cancel
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setPhotoUri(uri);
+      await storage.set(storage.STORAGE_KEY.PROFILE_PHOTO, uri);
+    }
+  };
 
   const onSubmit = async (data: ProfileForm) => {
     await storage.set(storage.STORAGE_KEY.PROFILE, data);
@@ -98,6 +164,21 @@ const profile = () => {
       reset(saved);
     }
     setIsEditing(false);
+  };
+
+  const renderAvatar = () => {
+    <View style={styles.avatarSection}>
+      <Pressable onPress={handlePhotoPress} style={styles.avatarContainer}>
+        {photoUri ? (
+          <Image source={{ uri: photoUri }} style={styles.avatar} />
+        ) : (
+          <View style={styles.avatarPlaceholder}>
+            <Ionicons name="camera" size={14} color={"#ffffff"} />
+          </View>
+          //TO CONTINUE NEXT CLASS
+        )}
+      </Pressable>
+    </View>;
   };
 
   if (isLoading) {
@@ -116,6 +197,8 @@ const profile = () => {
         contentContainerStyle={styles.content}
       >
         <Text style={styles.h1}>My Profile</Text>
+
+        {/* Week 11  */}
         <View style={styles.profileCard}>
           <View style={styles.profileRow}>
             <Text style={styles.profileLabel}>First Name</Text>
@@ -161,6 +244,7 @@ const profile = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.h1}>Edit Profile</Text>
+      {/* Week 11 */}
       {/* First Name */}
       <Text style={styles.label}>First Name</Text>
       <Controller
@@ -396,5 +480,46 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.input,
     padding: 16,
     alignItems: "center",
+  },
+
+  // Avatar Style (Week 11)
+  avatarSection: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  avatarContainer: {
+    position: "relative",
+  },
+  avatarPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: theme.color.border,
+  },
+  comeraBadge: {
+    position: "absolute",
+    bottom: 2,
+    right: 2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: theme.color.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: theme.color.bg,
+  },
+  photoHint: {
+    marginTop: 8,
+    fontSize: 13,
+    color: theme.color.mute,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: theme.color.border,
   },
 });

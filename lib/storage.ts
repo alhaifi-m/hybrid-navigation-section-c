@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const STORAGE_KEY = {
     PROFILE: "profile",
     NOTIFICATIONS: "notifications",
+    PROFILE_PHOTO: "profile_Photo",
 } as const
 
 // Get a value from storage (auto-parses JSON)
