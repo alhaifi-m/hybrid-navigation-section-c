@@ -24,13 +24,26 @@ export default function TabLayout() {
           ),
         }}
       />
-            <Tabs.Screen
+      <Tabs.Screen
         name="courses"
         options={{
           title: "Courses",
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "book" : "book-outline"}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: "Map",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "map" : "map-outline"}
               color={color}
               size={size}
             />

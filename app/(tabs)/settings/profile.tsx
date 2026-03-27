@@ -167,7 +167,7 @@ const profile = () => {
   };
 
   const renderAvatar = () => {
-    <View style={styles.avatarSection}>
+    return (    <View style={styles.avatarSection}>
       <Pressable onPress={handlePhotoPress} style={styles.avatarContainer}>
         {photoUri ? (
           <Image source={{ uri: photoUri }} style={styles.avatar} />
@@ -175,10 +175,13 @@ const profile = () => {
           <View style={styles.avatarPlaceholder}>
             <Ionicons name="camera" size={14} color={"#ffffff"} />
           </View>
-          //TO CONTINUE NEXT CLASS
         )}
+        <Text style={styles.photoHint}>
+          {photoUri ? "Tap to Change Photo" : "Add a Profile Photo"}
+        </Text>
       </Pressable>
-    </View>;
+    </View>)
+
   };
 
   if (isLoading) {
@@ -197,6 +200,7 @@ const profile = () => {
         contentContainerStyle={styles.content}
       >
         <Text style={styles.h1}>My Profile</Text>
+        {renderAvatar()}
 
         {/* Week 11  */}
         <View style={styles.profileCard}>
@@ -244,6 +248,7 @@ const profile = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.h1}>Edit Profile</Text>
+      {renderAvatar()}
       {/* Week 11 */}
       {/* First Name */}
       <Text style={styles.label}>First Name</Text>
